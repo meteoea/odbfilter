@@ -1,0 +1,305 @@
+#!/bin/ksh
+#create_ioassign      version:  20030930
+
+#set -x
+unalias -a
+
+#=======================================================================
+#
+#     Script create_ioassign     
+#     ----------------------
+#                         
+#     Purpose     : To create IOASSIGN file for the given ODB database
+#                               
+#     Usage       :  create_ioassign
+#     -----                -l dbname   ; database name
+#                         [-d dirname  ; location of ioassign_file]
+#                         [-n npools]  ; for how many pools (optional nowadays)
+#                         [-x]         ; expand ioassign_file to get rid of percent-d's
+#                         [-t task]    ; with component databases; use with -x
+#                         [-b iobuf]   ; I/O-bufsize suitable for ioassign f.ex. -b 2m
+#                         [-q]         ; be quiet (except for fatal errors)
+#                                            
+#     Parameters  : dbname    - database name, like ECMA or CCMA; must be supplied
+#     ----------    dirname   - directory where the IOASSIGN will be placed ;
+#                               the default: $WDIR/$dbname/
+#                   npools    - number of pools (default: from $WDIR/$dbname/ECMA.dd)
+#                   task      - component database(s); like -t amsua for ECMA.amsua
+#
+# Note: Does NOTHING if ODB_CREATE_IOASSIGN=0
+#
+#=======================================================================
+
+thiscmd=$(basename $0)
+
+if [[ $# -gt 0 ]] ; then
+  ARGS="${thiscmd} $*"
+else
+  ARGS="${thiscmd}"
+fi
+echo "$ARGS" >&2
+
+export ODB_CREATE_IOASSIGN=${ODB_CREATE_IOASSIGN:=1}
+
+if [[ "$ODB_CREATE_IOASSIGN" = 0 ]] ; then
+  echo "${thiscmd}: ODB_CREATE_IOASSIGN=0 --> IOASSIGN not produced/re-created" >&2
+  exit 0
+fi
+
+USAGE1="${thiscmd} -l dbname [-d dirname] [-n npools]"
+USAGE2="   [-x (to expand ioassign) -t task1 [-t task2] ...]"
+USAGE3="   [-q (quiet)] [-b iobufsize]"
+WDIR=${WDIR:=.}
+SWAPP_ODB_IOASSIGN=${SWAPP_ODB_IOASSIGN:-$PWD/ioassign.x}
+
+dbname=none
+dir=.
+npools=0
+expand=0
+alltasks=""
+iobuf=4m
+silence=0
+
+errflg=0
+
+FLAGS="b:d:l:n:qt:x"
+
+while getopts $FLAGS option
+do
+  case $option in
+    b) iobuf=$OPTARG;;
+    l) dbname=$OPTARG;;
+    d) dir="$OPTARG";;
+    n) npools=$OPTARG;;
+    q) silence=1;;
+    t) alltasks="$alltasks $OPTARG";;
+    x) expand=1;;
+    *) errflg=1; break;;
+  esac
+done
+
+if [[ $silence -eq 0 ]] ; then
+  echo "$ARGS" >&2
+fi
+
+export ODB_CREATE_IOASSIGN=${ODB_CREATE_IOASSIGN:=1}
+
+if [[ "$ODB_CREATE_IOASSIGN" = 0 ]] ; then
+  if [[ $silence -eq 0 ]] ; then
+    echo "${thiscmd}: ODB_CREATE_IOASSIGN=0 --> IOASSIGN not produced/re-created" >&2
+  fi
+  exit 0
+fi
+
+#=======================================================================
+#   Check parameters
+#=======================================================================
+
+if [[ $dbname = none ]] ; then
+  echo "${thiscmd}: An invalid (or none) dbname=$dbname was supplied via -l option" >&2
+  errflg=1
+fi
+
+if [[ "$dir" = "" ]] ; then
+  dir=$WDIR/$dbname
+fi
+
+[[ -d $dir ]] || mkdir -p $dir || errflg=1
+
+if [[ ! -d $dir ]] ; then
+  echo "${thiscmd}: Database dir '$dir' not found" >&2
+  errflg=1
+fi
+
+if [[ $expand -eq 1 && "$alltasks" = "" ]] ; then
+  alltasks=$(\cd $dir/.. >/dev/null 2>&1 ; \ls -C1pd $dbname.* | \
+             awk -F/ '{print $1}' | sed "s/^$dbname\.//g" | sort -u)
+fi
+
+if [[ $errflg -ne 0 ]] ; then
+  echo "$ARGS" >&2
+  echo $USAGE1 >&2
+  echo $USAGE2 >&2
+  echo $USAGE3 >&2
+  exit 1
+fi
+
+ddfile=$dir/$dbname.dd
+
+if [[ $npools -le 0 ]] ; then # try to find out correct no. of pools
+  if [[ -s $ddfile ]] ; then
+    npools=$(head -5 $ddfile | tail -1)
+  else
+    npools=${ODB_IOASSIGN_MAXPROC:=0} # Can be a very bad thing ;-(
+  fi
+  if [[ $silence -eq 0 ]] ; then
+    echo "${thiscmd}: Total no. of pools was detected automatically from file '$ddfile' ;" >&2
+    echo "    Using value for npools='$npools'" >&2
+  fi
+fi
+
+export ODB_IO_METHOD=${ODB_IO_METHOD:=1}
+
+io_method=$ODB_IO_METHOD
+if [[ -s $ddfile ]] ; then
+  iom=$(head -1 $ddfile | awk 'BEGIN {n=0;} {if (NF >= 3) n=$3;} END {print n;}')
+  [[ $iom -ne 0 ]] || io_method=$iom
+fi
+
+#-- I/O-buffer size
+iodef="-r $iobuf -w $iobuf -p $iobuf -e $iobuf"
+
+#-- Get list of tables either from existing $ddfile or using latest known tables
+
+if [[ -s $ddfile ]] ; then
+  tables=$(egrep "^@" $ddfile | awk '{print $1}' | perl -pe 's#\@# #g;')
+else
+#-- Known tables 
+
+  tables="aeolus_1b aeolus_2b aeolus_auxmet aeolus_hdr aeolus_hdr_cal"
+  tables="$tables atovs atovs_pred atovs_body body bufr bufr_tables bufr_tables_desc"
+  tables="$tables ddrs desc errstat hdr index poolmask resat"
+  tables="$tables rtovs rtovs_body rtovs_mlev rtovs_pred rtovs_slev"
+  tables="$tables sat satem satob scatt scatt_body smos"
+  tables="$tables ssmi ssmi_body ssmi_mlev ssmi_slev"
+  tables="$tables timeslot_index update limb resat_averaging_kernel"
+  tables="$tables radar radar_body radar_station"
+  tables="$tables modsurf radiance allsky co2_sink cloud_sink collocated_imager_information"
+  tables="$tables auxiliary auxiliary_body radiance_body allsky_body gnssro gnssro_body gbrad gbrad_body"
+  tables="$tables conv conv_body"
+
+  #-- Include only minimal amount of update tables
+  #   Note: can't use MXUP_TRAJ, since $NMXUPD in data layout may have a larger value
+
+  jpmxup=10 # from source code of IFS ; see ifs/module/parcma.F90
+
+  uptraj=0
+  while [[ $uptraj -lt $jpmxup ]]
+  do
+    ((uptraj += 1))
+    tables="$tables update_$uptraj"
+  done
+
+  jpmxenkf=100 # from source code of IFS ; see ifs/module/parcma.F90
+
+  enkf_count=0
+  while [[ $enkf_count -lt $jpmxenkf ]]
+  do
+    ((enkf_count += 1))
+    tables="$tables enkf_$enkf_count"
+  done
+
+
+fi
+
+
+#-- Start creating IOASSIGN-file (in the fastest possible way ?)
+#   $ioass_cmd -s -n $npools $iodef -a \$ODB_DATAPATH_$dbname/%d/$cmd $dbname..%d
+
+unset IOASSIGN  || :
+tmpfile=__ioassign__.$$
+cat /dev/null > $tmpfile
+
+$SWAPP_ODB_IOASSIGN -s -a \$ODB_SRCPATH_$dbname/$dbname.dd $dbname                   >> $tmpfile
+$SWAPP_ODB_IOASSIGN -s -a \$ODB_SRCPATH_$dbname/$dbname.sch $dbname.sch              >> $tmpfile
+$SWAPP_ODB_IOASSIGN -s -a \$ODB_SRCPATH_$dbname/$dbname.flags $dbname.flags          >> $tmpfile
+$SWAPP_ODB_IOASSIGN -s -a \$ODB_SRCPATH_$dbname/$dbname.iomap $dbname.iomap          >> $tmpfile
+#ioassign -s -a \$ODB_SRCPATH_$dbname/$dbname.iomap.idx $dbname.iomap.idx  >> $tmpfile
+
+#-- dca : direct column access -files (globally one file per table)
+#         only applicable for self-contained databases i.e. $expand == 0
+
+dcadir=dca
+if [[ $expand -eq 0 ]] ; then
+  for tbl in $tables
+  do
+    $SWAPP_ODB_IOASSIGN -s -a \$ODB_SRCPATH_$dbname/$dcadir/$tbl.dca $dbname.$tbl.dca >> $tmpfile
+  done
+fi
+
+#-- idx : row indices (potentially one per table per pool) : not implemented yet
+idxdir=idx
+
+if [[ $expand -eq 0 ]] ; then # Retain percent-d's
+  #-- Sense whether gzipped already ?
+  hdrgz=$(find . -type f -name 'hdr.gz' -print | head -1)
+  if [[ "$hdrgz" != "" ]] ; then
+    cmd=".gz -c #gzip"
+  else
+    cmd=""
+  fi
+  #-- No gzipping of QTARFILE ($ODB_IO_METHOD = 3)
+  $SWAPP_ODB_IOASSIGN -s -n $npools $iodef -a \$ODB_DATAPATH_$dbname/%d/QTARFILE $dbname.QTARFILE.%d >> $tmpfile
+
+  for tbl in $tables
+  do
+    $SWAPP_ODB_IOASSIGN -s -n $npools $iodef -a \$ODB_DATAPATH_$dbname/%d/$tbl$cmd $dbname.$tbl.%d >> $tmpfile
+  done
+
+#  for tbl in $tables
+#  do
+#    $ioass_cmd -s -n $npools $iodef -a \$ODB_SRCPATH_$dbname/$idxdir/$tbl.idx.%d $dbname.$tbl.%d.idx >> $tmpfile
+#  done
+
+else # Expand
+
+  #-- Create template file for table=_xxx_ for subsequent filtering
+  tbl=_xxx_
+  template=__template__.$$
+  cat /dev/null > $template
+  p=0
+  for task in $alltasks
+  do
+    d=$dir/../$dbname.$task
+    ddfile=$d/$dbname.dd
+    if [[ $silence -eq 0 ]] ; then
+      echo "${thiscmd}: Processing $ddfile ; p=$p" >&2
+    fi
+    if [[ -s $ddfile ]] ; then
+      #-- Sense whether gzipped already ?
+      hdrgz=$(find . -type f -name 'hdr.gz' -print | head -1)
+      if [[ "$hdrgz" != "" ]] ; then
+        cmd=".gz -c #gzip"
+      else
+        cmd=""
+      fi
+      np=$(head -5 $ddfile | tail -1)
+      ((psta = p + 1))
+      ((pend = p + np))
+      #-- In the following the %d after "-a" option i.e. physical filename 
+      #   expands (-x) between range [1 .. $np], but the logical filename's %d
+      #   expands between range [$psta .. $pend] i.e [$psta .. $psta + $np - 1] (due to -S)
+      $SWAPP_ODB_IOASSIGN -s -x -n $np -S $psta $iodef \
+               -a \$ODB_DATAPATH_$dbname/../$dbname.$task/%d/$tbl$cmd \
+               $dbname.$tbl.%d >> $template
+#      $ioass_cmd -s -x $iodef \
+#               -a \$ODB_SRCPATH_$dbname/$idxdir/$tbl.idx \
+#               $dbname.$tbl.idx >> $template
+      p=$pend
+    fi # if [[ -s $ddfile ]]
+  done
+
+  if [[ $p -ne $npools ]] ; then
+    if [[ $silence -eq 0 ]] ; then
+      echo "${thiscmd}: ***Warning: Inconsistent no. of pools found=$p ; expected=$npools" >&2
+    fi
+  fi
+
+  #-- Now filter "_xxx_" across all tables using Perl to create final IOASSIGN-file
+  for tbl in $tables
+  do
+    perl -pe "s/_xxx_/$tbl/g" < $template >> $tmpfile
+  done
+  rm -f $template
+fi
+
+rm -f $dir/*IOASSIGN* || true
+cp $tmpfile $dir/$dbname.IOASSIGN
+
+rm -f $tmpfile
+
+# for compatibility & convenience
+(\cd $dir >/dev/null 2>&1 ; ln -s $dbname.IOASSIGN IOASSIGN.$dbname)
+(\cd $dir >/dev/null 2>&1 ; ln -s $dbname.IOASSIGN IOASSIGN)
+
+exit 0

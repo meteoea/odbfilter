@@ -1,0 +1,73 @@
+#!/usr/bin/perl -w
+
+use strict;
+use FileHandle;
+
+sub slurp
+{
+  my $f = shift;
+  my $fh = 'FileHandle'->new ("<$f");
+  if (wantarray ())
+    {
+       my @text = <$fh>;
+       return @text;
+    }
+  else
+    {
+       local $/ = undef;
+       my $text = <$fh>;
+       return $text;
+    }
+}
+
+# Change the CCMA to a pseudo-ECMA :
+# 1 remove links related to IOASSIGN
+# (unfortunately we are not sure who's who, so let's remove the actual links) 
+
+
+rename ('CCMA', 'ECMA');
+chdir ('ECMA');
+
+my @ioassign;
+
+@ioassign = <*IOASSIGN*>;
+
+for my $ioassign (grep { -l } @ioassign)
+  {
+    unlink ($ioassign);
+  }
+
+@ioassign = <*IOASSIGN*>;
+
+if (@ioassign != 1)
+  {
+    die ("Multiple IOASSIGNs found : @ioassign\n");
+  }
+
+my ($ioassign) = @ioassign;
+
+# then rename the real file to CCMA.IOASSIGN in order to enable the systematic CCMA->ECMA substitution below :
+# Unfortunately, this file may contain more IO assignments than what is actually needed ; therefore we have to 
+# filter only the relevent IO assignments (otherwise poor ODB has SIGSEGV)
+
+my @text = grep { m/CCMA/o } &slurp ($ioassign);
+
+unlink ($ioassign);
+
+'FileHandle'->new ('>CCMA.IOASSIGN')->print (join ('', @text));
+
+
+for my $fccma (<CCMA.*>)
+  {
+    (my $fecma = $fccma) =~ s/CCMA/ECMA/go;
+    (my $text = &slurp ($fccma)) =~ s/CCMA/ECMA/goms;
+    unlink ($fccma);
+    'FileHandle'->new (">$fecma")->print ($text);
+  }
+
+# 4 Remake links related to IOASSIGN in a proper manner :
+
+symlink( 'ECMA.IOASSIGN', 'IOASSIGN');
+symlink( 'ECMA.IOASSIGN', 'IOASSIGN.ECMA');
+
+chdir ('..');
