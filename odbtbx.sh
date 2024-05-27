@@ -7,7 +7,7 @@ touch $LOG
 # Function filter
 ##############################################################
 function filter {
-arg=`echo $1 | sed "s/-/ /g"`
+arg=`echo $1 | sed "s/,/ /g"`
 export ODB_CONSIDER_TABLES="* except /bufr/"
 export ODB_SRCPATH_CCMA=$WORKDIR/CCMA
 export ODB_DATAPATH_CCMA=$WORKDIR/CCMA
@@ -24,6 +24,11 @@ export IOASSIGN=$WORKDIR/CCMA/IOASSIGN
 echo "PACK: $PACK" >> $LOG
 echo "BATOR_NBPOOL: $BATOR_NBPOOL" >> $LOG
 echo "FILTER: $PACK/odbfilter/odb_filter $arg" >> $LOG
+
+chmod +w $WORKDIR/CCMA
+chmod +w $WORKDIR/CCMA/*
+chmod +w $WORKDIR/CCMA/*/*
+
 
 $PACK/odbfilter/odb_filter $arg
 obstype=`echo $arg | cut -d\  -f2`
@@ -87,8 +92,6 @@ $PACK/odbfilter/odb_filter fg_depar $obstype
 ##############################################################
 # MAIN
 ##############################################################
-
-module load intel/2018.5.274_mkl_nightly_2019u2
 
 while getopts "f:s" arg; do
   case $arg in

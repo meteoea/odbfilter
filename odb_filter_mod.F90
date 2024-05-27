@@ -17,7 +17,9 @@ subroutine odb_filter_start(odb, filter, vars, vals, nb_obs)
   character(len=32), allocatable, intent(inout) :: vars(:)
   real(8), allocatable          , intent(inout) :: vals(:)
   integer(4)                    , intent(out)   :: nb_obs
-  integer(4) :: npools,rc, ivar
+  integer(4) :: npools,rc
+  integer(8) :: ivar
+  real(8) :: rvar
   character(len=64) cvar
 
   call odb_env()
@@ -86,6 +88,21 @@ subroutine odb_filter_start(odb, filter, vars, vals, nb_obs)
       vars(4)="$tslot"
 
     case ('singleobs')
+      allocate(vars(2),vals(2))
+      call getarg(2,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(1)=real(ivar)
+      vars(1)="$otype"
+      call getarg(3,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(2)=real(ivar)
+      vars(2)="$vno"
+      if ( iargc() == 4 ) then
+        call getarg(4,cvar)
+        read(unit=cvar,fmt='(I3)') nb_obs
+      endif
+
+    case ('singleobs_sv')
       allocate(vars(3),vals(3))
       call getarg(2,cvar)
       read(unit=cvar,fmt='(I3)') ivar
@@ -147,6 +164,115 @@ subroutine odb_filter_start(odb, filter, vars, vals, nb_obs)
       read(unit=cvar,fmt='(I3)') ivar
       vals(2)=real(ivar)
       vars(2)="$vno"
+
+    case ('singleradar')
+      allocate(vars(6),vals(6))
+      call getarg(2,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(1)=real(ivar)
+      vars(1)="$otype"
+      call getarg(3,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(2)=real(ivar)
+      vars(2)="$vno"
+      call getarg(4,cvar)
+      read(unit=cvar,fmt='(I8)') ivar
+      vals(3)=real(ivar)
+      vars(3)="$ident"
+      call getarg(5,cvar)
+      read(unit=cvar,fmt='(F9.2)') rvar
+      vals(4)=rvar
+      vars(4)="$distance"
+      call getarg(6,cvar)
+      read(unit=cvar,fmt='(F5.2)') rvar
+      vals(5)=rvar
+      vars(5)="$elev"
+      call getarg(7,cvar)
+      read(unit=cvar,fmt='(F6.2)') rvar
+      vals(6)=rvar
+      vars(6)="$azimut"  
+      write(*,*) vals
+      write(*,*) vars
+
+    case ('singlegpssol')
+      allocate(vars(4),vals(4))
+      call getarg(2,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(1)=real(ivar)
+      vars(1)="$otype"
+      call getarg(3,cvar)
+      read(unit=cvar,fmt='(I3)') ivar
+      vals(2)=real(ivar)
+      vars(2)="$ctype"
+      call getarg(4,cvar)
+      read(unit=cvar,fmt='(F6.3)') rvar
+      vals(3)=rvar
+      vars(3)="$lon"
+      call getarg(5,cvar)
+      read(unit=cvar,fmt='(F6.3)') rvar
+      vals(4)=rvar
+      vars(4)="$lat"
+
+    case ('singlestatid')
+        allocate(vars(1),vals(1))
+        call getarg(2,cvar)
+        vals(1)=transfer(cvar,vals(1))
+        vars(1)="$statid"
+        print*,vals
+        print*,vars
+
+
+    case ('singleobsarea')
+        allocate(vars(8),vals(8))
+        call getarg(2,cvar)
+        read(unit=cvar,fmt='(I3)') ivar
+        vals(1)=real(ivar)
+        vars(1)="$otype"
+        call getarg(3,cvar)
+        read(unit=cvar,fmt='(I3)') ivar
+        vals(2)=real(ivar)
+        vars(2)="$varno"
+        call getarg(4,cvar)
+        read(unit=cvar,fmt='(F6.2)') rvar
+        vals(3)=rvar*3.14159/180.
+        vars(3)="$lonmin"
+        call getarg(5,cvar)
+        read(unit=cvar,fmt='(F6.2)') rvar
+        vals(4)=rvar*3.14159/180.
+        vars(4)="$lonmax"
+        call getarg(6,cvar)
+        read(unit=cvar,fmt='(F6.2)') rvar
+        vals(5)=rvar*3.14159/180.
+        vars(5)="$latmin"
+        call getarg(7,cvar)
+        read(unit=cvar,fmt='(F6.2)') rvar
+        vals(6)=rvar*3.14159/180.
+        vars(6)="$latmax"
+        call getarg(8,cvar)
+        read(unit=cvar,fmt='(F9.2)') rvar
+        vals(7)=rvar
+        vars(7)="$presmin"
+        call getarg(9,cvar)
+        read(unit=cvar,fmt='(F9.2)') rvar
+        vals(8)=rvar
+        vars(8)="$presmax"
+
+        print*,vals
+        print*,vars
+
+    case ('singleobscanal')
+        allocate(vars(2),vals(2))
+        call getarg(2,cvar)
+        read(unit=cvar,fmt='(I3)') ivar
+        vals(1)=real(ivar)
+        vars(1)="$otype"
+        call getarg(3,cvar)
+        read(unit=cvar,fmt='(I3)') ivar
+        vals(2)=real(ivar)
+        vars(2)="$vertco"
+
+        print*,vals
+        print*,vars
 
   end select
 

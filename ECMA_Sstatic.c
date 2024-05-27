@@ -19,5 +19,11 @@ ODB_ANCHOR_VIEW(ECMA, select_for_debug );
 ODB_ANCHOR_VIEW(ECMA, delete_passive );
 ODB_ANCHOR_VIEW(ECMA, select_amsua );
 ODB_ANCHOR_VIEW(ECMA, select_timeslot );
+ODB_ANCHOR_VIEW(ECMA, select_oneobs_radar );
+ODB_ANCHOR_VIEW(ECMA, select_oneobs_gpssol );
+ODB_ANCHOR_VIEW(ECMA, select_onestatid );
+ODB_ANCHOR_VIEW(ECMA, select_oneobstypearea );
+ODB_ANCHOR_VIEW(ECMA, select_oneobscanal );
+ODB_ANCHOR_VIEW(ECMA, select_sophie );
 }
 
