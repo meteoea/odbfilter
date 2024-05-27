@@ -64,7 +64,7 @@ CMA_OBJ='_odb_glue.o CCMA_Sstatic.o ECMA_Sstatic.o odb_filter_mod.o'
 LIB0="-lcma-odb.$TYPE_PACK -lodb.$TYPE_PACK  -lmain-odb.$TYPE_PACK -lifsaux.$TYPE_PACK"
 LIB1="-L $LIBNCDF -lnetcdf -L $LIBNCDFF -lnetcdff -lstdc++"
 
-SRCDIR=$PWD
+SRCDIR=`dirname $0`
 MAINS=filter.F90
 CMA_SQL=`cd $SRCDIR; ls *.sql`
 
