@@ -467,6 +467,14 @@ program odb_filter
       rc=ODB_put(odb,"select_sophie",x2,nrows,ncols=ncols)
       print *, "Nb obs selected: ",nrows," out of: ",nall
 
+    case ('copy_fg_in_actual_depar')
+      rc=ODB_select(odb,"select_fg_actual_depar",nrows,ncols,nra=nra)
+      allocate(x2(nra,0:ncols))
+      rc=ODB_get(odb,"select_fg_actual_depar",x2,nrows,ncols=ncols)
+      x2(1:nra,2)=x2(1:nra,1)
+      rc=ODB_put(odb,"select_fg_actual_depar",x2,nrows,ncols=ncols)
+      print *, "Nb obs copied: ",nra
+
    case default
       print*, "Invalid filter, usage:"       
       print*, "  odb_filter type <obstype>" 

@@ -25,5 +25,6 @@ ODB_ANCHOR_VIEW(CCMA, select_onestatid );
 ODB_ANCHOR_VIEW(CCMA, select_oneobstypearea );
 ODB_ANCHOR_VIEW(CCMA, select_oneobscanal );
 ODB_ANCHOR_VIEW(CCMA, select_sophie );
+ODB_ANCHOR_VIEW(CCMA, select_fg_actual_depar );
 }
 
