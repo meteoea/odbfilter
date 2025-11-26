@@ -1,4 +1,5 @@
-NPOOL=160
+PACK=/home/gmap/mrpe/arbogaste/pack/cy49t1_op1-4denvar.06.IMPIIFC2018DP.x
+NPOOL=192
 
 unset ODB_CONSIDER_TABLES
 unset IOASSIGN
@@ -25,7 +26,7 @@ export ODB_ERRTRA=1
 export ODB_IO_FILESIZE=32
 export ODB_IO_GRPSIZE=$NPOOL
 export ODB_IO_LOCK=1
-export ODB_IO_METHOD=1
+export ODB_IO_METHOD=4
 export ODB_IO_OPENMP=0
 export ODB_MPEXCHANGE2_PACKMAX=4000000
 export ODB_PACKING=-1
@@ -37,11 +38,12 @@ export ODB_WRITE_EMPTY_FILES=0
 export TO_ODB_ECMWF=0
 export TO_ODB_SWAPOUT=0
 
-export PATH=$PACK/bin:$PACK/odbfilter:$PATH
+export PATH=.:/$PACK/bin:$PACK/odbfilter:$PATH
 
 # Create IOASSIGN
 CCMA2ECMA
 ln -s $PACK/bin/odbtools.x shuffle
+export ODB_IOASSIGN_BINARY=$PACK/bin/ioassign
 SWAPP_ODB_IOASSIGN=$PACK/bin/ioassign create_ioassign -l CCMA -n $NPOOL -d $ODB_DATAPATH_CCMA 
 cat $ODB_SRCPATH_CCMA/IOASSIGN $ODB_SRCPATH_ECMA/IOASSIGN > IOASSIGN 
 
