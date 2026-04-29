@@ -1,0 +1,8 @@
+build/
+*.o
+*.mod
+*.so
+*.exe
+*.x
+.DS_Store
+*~

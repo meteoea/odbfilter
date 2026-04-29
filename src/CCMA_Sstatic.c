@@ -1,8 +1,18 @@
+/*
+ * CCMA_Sstatic.c - CCMA schema static initializer
+ * 
+ * Registers all SQL view functions for the CCMA (Current Cycle Model Analysis)
+ * database schema. ODB uses this to set up the function pointers for
+ * each view defined in the SQL files.
+ */
+
 #define ODB_GENCODE 0
 #include "CCMA.h"
 
+/* Initialize static function pointers for all CCMA views */
 PUBLIC void CCMA_static_init() {
 ODB_ANCHOR(CCMA);
+/* Register all SQL views for CCMA schema */
 ODB_ANCHOR_VIEW(CCMA, hdr_set_passive );
 ODB_ANCHOR_VIEW(CCMA, select_all );
 ODB_ANCHOR_VIEW(CCMA, select_obstype_sensor );
