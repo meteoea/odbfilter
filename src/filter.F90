@@ -344,7 +344,7 @@ print *, "Nb obs selected: ",nrows
         x2(iobs:iobs,2)=1
       enddo
       rc=ODB_put(odb,"select_oneobs_gpssol",x2,nrows,ncols=ncols)
-      print *, "Nb obs selected: ",nb_obs," out of: ",rows
+      print *, "Nb obs selected: ",nb_obs," out of: ",nrows
 
 ! Filter by single station ID
     case ('singlestatid')
@@ -461,15 +461,6 @@ print *, "Nb obs selected: ",nrows
       x2(1:nra,2)=x2(1:nra,1)
       rc=ODB_put(odb,"select_fg_actual_depar",x2,nrows,ncols=ncols)
       print *, "Nb obs copied: ",nra
-
-! Copy first guess departure into actual departure column
-   case ('copy_fg_in_actual_depar')
-     rc=ODB_select(odb,"select_fg_actual_depar",nrows,ncols,nra=nra)
-     allocate(x2(nra,0:ncols))
-     rc=ODB_get(odb,"select_fg_actual_depar",x2,nrows,ncols=ncols)
-     x2(1:nra,2)=x2(1:nra,1)
-     rc=ODB_put(odb,"select_fg_actual_depar",x2,nrows,ncols=ncols)
-     print *, "Nb obs copied: ",nra
 
 ! Unknown filter type - show usage
    case default
