@@ -11,12 +11,27 @@
 !   singleobs, obstype_sensor, tslot, onestatid, oneobstypearea,
 !   oneobs_gpssol, oneobs_radar, oneobscanal, etc.
 
+! filter.F90 - ODB filter main program
+!
+! This program filters observations from ODB databases (CCMA/ECMA).
+! It supports multiple filter types (timeslot, obstype, varno, etc.)
+! and can select, delete, or modify observations based on SQL queries.
+!
+! Usage: odb_filter <filter_type> [arguments...]
+!
+! Filter types:
+!   timeslot, type, deletetype, amsua, varno, deletevarno, wind,
+!   singleobs, obstype_sensor, tslot, onestatid, oneobstypearea,
+!   oneobs_gpssol, oneobs_radar, oneobscanal, etc.
+
 program odb_filter
 
   use odb_module
   use odb_filter_mod
 
   implicit none
+
+  real(8), parameter :: PI = 3.14159265358979323846
 
   integer(4) :: odb,rc,nra,ncols,nrows,nall,nb_obs,iobs,istep,nb_wind
   integer(4) :: ipart,istart,istop,iseqno

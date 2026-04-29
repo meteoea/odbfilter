@@ -1,6 +1,19 @@
+! odb_filter_mod.F90 - ODB Filter Module
+!
+! This module provides the initialization and cleanup routines for odbfilter.
+! It handles:
+!   - Parsing command-line arguments to determine filter type
+!   - Setting up ODB environment variables
+!   - Opening/Closing ODB databases (CCMA)
+!   - Updating observation status (active/passive)
+!
+! Usage: Called from filter.F90 main program
+!
 module odb_filter_mod
   use odb_module
   implicit none
+
+  real(8), parameter :: PI = 3.14159265358979323846
 
 private
 
@@ -234,19 +247,19 @@ subroutine odb_filter_start(odb, filter, vars, vals, nb_obs)
         vars(2)="$varno"
         call getarg(4,cvar)
         read(unit=cvar,fmt='(F6.2)') rvar
-        vals(3)=rvar*3.14159/180.
+        vals(3)=rvar*PI/180.
         vars(3)="$lonmin"
         call getarg(5,cvar)
         read(unit=cvar,fmt='(F6.2)') rvar
-        vals(4)=rvar*3.14159/180.
+        vals(4)=rvar*PI/180.
         vars(4)="$lonmax"
         call getarg(6,cvar)
         read(unit=cvar,fmt='(F6.2)') rvar
-        vals(5)=rvar*3.14159/180.
+        vals(5)=rvar*PI/180.
         vars(5)="$latmin"
         call getarg(7,cvar)
         read(unit=cvar,fmt='(F6.2)') rvar
-        vals(6)=rvar*3.14159/180.
+        vals(6)=rvar*PI/180.
         vars(6)="$latmax"
         call getarg(8,cvar)
         read(unit=cvar,fmt='(F9.2)') rvar
@@ -282,7 +295,13 @@ end subroutine odb_filter_start
 !----------------------------------------------------------------------------
 
 
-
+!----------------------------------------------------------------------------
+! odb_filter_end - Cleanup and commit ODB changes
+!
+! Updates observation status based on filter results:
+!   - Sets REPORT_STATUS.ACTIVE=0 for passive observations (hdr_set_passive)
+!   - Sets REPORT_STATUS.ACTIVE=1 for selected observations (update_hdr_status)
+!   - Closes ODB with or without committing changes
 !----------------------------------------------------------------------------
 subroutine odb_filter_end(odb,ok)
 
@@ -317,7 +336,15 @@ subroutine odb_filter_end(odb,ok)
   rc = ODB_end()
 end subroutine odb_filter_end
 !----------------------------------------------------------------------------
-
+!----------------------------------------------------------------------------
+! odb_env - Set ODB environment variables
+!
+! Configures ODB for CCMA database processing:
+!   - ODB_CONSIDER_TABLES: Excludes /bufr/ tables
+!   - ODB_SRCPATH/DATAPATH: Points to CCMA database
+!   - ODB_STATIC_LINKING: Uses static linking
+!   - ODB_IO_METHOD: Sets I/O method to 1
+!   - ODB_CMA: Sets database type to CCMA
 !----------------------------------------------------------------------------
 subroutine odb_env
 

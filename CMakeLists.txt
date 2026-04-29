@@ -133,4 +133,4 @@ set_target_properties(odb_filter PROPERTIES
 
 install(TARGETS odb_filter DESTINATION bin)
 install(PROGRAMS scripts/CCMA2ECMA src/create_ioassign DESTINATION bin)
-install(PROGRAMS src/odbtbx.sh src/odbtbx_new.sh DESTINATION bin)
+install(PROGRAMS scripts/odbtbx.sh DESTINATION bin)
