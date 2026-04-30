@@ -4,6 +4,9 @@
  * This file provides the interface between the ODB (Ocean Data Base) library
  * and the odbfilter application. It sets up entry points for database schemas
  * and registers static initializers.
+ *
+ * NOTE: This file is auto-generated from cmake/templates/_odb_glue.c.in
+ *       Do not edit directly. Modify the template file instead.
  */
 
 #include <stdio.h>
@@ -13,6 +16,7 @@
 void ctxprint_() {}
 
 /* ODB internal function declarations */
+/* codb_procdata_: ODB function to get processor information */
 extern void
 codb_procdata_(int *myproc,
                int *nproc,
@@ -21,12 +25,15 @@ codb_procdata_(int *myproc,
                int *inumt);
 
 /* Function to register a function in ODB's function list */
+/* ODB_add2funclist: registers a schema initializer function with ODB */
 extern void 
 ODB_add2funclist(const char *dbname,
    void (*func)(),
                  int funcno);
 
 /* Macro to initialize a database schema's static data */
+/* This macro checks if the provided dbname matches the schema name,
+   and if so, registers the schema's static_init function */
 #define Static_Init(db) \
 if (strncmp(dbname, #db, dbname_len) == 0) { \
   extern void db##_static_init(); \
@@ -37,6 +44,9 @@ else { /* fprintf(stderr,"***Warning: Not initializing '%s'\n",#db); */ }
 /*
  * Entry point called by ODB to set up database schema initializers
  * Registers static init functions for all detected schemas
+ *
+ * @param dbname: The database schema name (e.g., "CCMA", "ECMA")
+ * @param dbname_len: Length of the dbname string (Fortran hidden argument)
  */
 void
 codb_set_entrypoint_(const char *dbname
@@ -44,11 +54,14 @@ codb_set_entrypoint_(const char *dbname
                , int dbname_len)
 {
   int myproc = 0;
+  /* Get processor information - used to determine if this is proc 1 for debug output */
   codb_procdata_(&myproc, NULL, NULL, NULL, NULL);
   if (myproc == 1) {
     fprintf(stderr,
             "codb_set_entrypoint_(dbname='%*s', dbname_len=%d)\n",
             dbname_len, dbname, dbname_len);
   }
+  /* Register static initializers for all detected schemas */
+  /* @STATIC_INIT_CALLS@ is replaced by CMake with Static_Init() calls */
 @STATIC_INIT_CALLS@
 }
