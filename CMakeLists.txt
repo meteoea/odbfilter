@@ -14,14 +14,13 @@ find_library(NETCDF_LIB netcdf PATHS ${LIBNCDF} /usr/lib /usr/local/lib)
 find_library(NETCDFF_LIB netcdff PATHS ${LIBNCDFF} /usr/lib /usr/local/lib)
 
 set(ODB_COMPILER "${PACK}/sys/odb98.x" CACHE PATH "ECMA include dir")
-set(INC_CCMA "${PACK}/src/${TYPE_PACK}/odb/ddl.CCMA" CACHE PATH "CCMA include dir")
-set(INC_ECMA "${PACK}/src/${TYPE_PACK}/odb/ddl.ECMA" CACHE PATH "ECMA include dir")
-set(INC1 "${PACK}/src/${TYPE_PACK}/odb/module" CACHE PATH "ODB module dir")
+set(INC_CMA "${PACK}/src/${TYPE_PACK}/odb/ddl" CACHE PATH "CMA include dir")
+set(INC_ODB "${PACK}/src/${TYPE_PACK}/odb/module" CACHE PATH "ODB module dir")
 
 set(LIBNCDF "" CACHE PATH "NetCDF library path")
 set(LIBNCDFF "" CACHE PATH "NetCDF Fortran library path")
 
-include_directories(${INC_CCMA} ${INC_ECMA} ${INC1} ${MODULE})
+include_directories(${INC_CMA}.CCMA ${INC_CMA}.ECMA ${INC_ODB} ${MODULE})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(FIAT_DIR "" CACHE PATH "Fiat installation directory")
@@ -38,7 +37,8 @@ if(NOT ODB98_EXECUTABLE)
   message(WARNING "odb98.x not found - SQL processing will fail")
 endif()
 
-add_subdirectory(sql)
+add_subdirectory(ddl.CCMA)
+add_subdirectory(ddl.ECMA)
 
 set_source_files_properties(
   src/CCMA_Sstatic.c
@@ -61,7 +61,8 @@ add_executable(odb_filter src/filter.F90 src/odb_filter_mod.F90
 )
 
 target_link_libraries(odb_filter
-  sqls_lib
+  CCMA_lib
+  ECMA_lib
   -L${PACK}/lib -lcma-odb.${TYPE_PACK}
   -lodb.${TYPE_PACK}
   -lmain-odb.${TYPE_PACK}

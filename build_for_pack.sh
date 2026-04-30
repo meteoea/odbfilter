@@ -18,6 +18,7 @@ NCDFF=`grep "LD_USR_NETCDF_F " $PACK/.gmkfile/* | cut -d\  -f 3`
 NCDF=`grep "LD_USR_NETCDF " $PACK/.gmkfile/* | cut -d\  -f 3`
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NCDFF:$NCDF
+export ODB_COMPILER=$PACK/sys
 export ODB_COMPILER_FLAGS=$PACK/src/$TYPE_PACK/odb/ddl.CCMA/odb98.flags
 export ODB_CREATE_IOASSIGN=$PACK/src/$TYPE_PACK/odb/scripts/create_ioassign
 export ODB_SYSPATH=$PACK/src/$TYPE_PACK/odb/ddl.CCMA
@@ -34,12 +35,12 @@ cmake . \
   -DCMAKE_CXX_COMPILER=icxx \
   -DCMAKE_Fortran_COMPILER=ifort \
   -DCMAKE_Fortran_COMPILER_ID=Intel \
+  -DODB_COMPILER=$ODB_COMPILER \
   \
   -DLIBNCDF=$NCDF \
   -DLIBNCDFF=$NCDFF \
-  -DINC_CCMA=$PACK/src/$TYPE_PACK/odb/ddl.CCMA \
-  -DINC_ECMA=$PACK/src/$TYPE_PACK/odb/ddl.ECMA \
-  -DINC1=$PACK/src/$TYPE_PACK/odb/module \
+  -DINC_CMA=$PACK/src/$TYPE_PACK/odb/ddl \
+  -DINC_ODB=$PACK/src/$TYPE_PACK/odb/module \
   -DFIAT_DIR=$PACK/hub/$TYPE_PACK/install/Fiat \
   -DTYPE_PACK=$TYPE_PACK \
   -DPACK=$PACK \
