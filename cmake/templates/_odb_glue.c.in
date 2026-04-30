@@ -1,7 +1,7 @@
 /*
  * _odb_glue.c - ODB glue code for odbfilter
  * 
- * This file provides the interface between the ODB (Ocean Data Base) library
+ * This file provides the interface between the ODB (Observations Data Base) library
  * and the odbfilter application. It sets up entry points for database schemas
  * and registers static initializers.
  *

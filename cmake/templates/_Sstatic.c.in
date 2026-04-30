@@ -2,7 +2,7 @@
  * @SCHEMA@_Sstatic.c - @SCHEMA@ schema static initializer
  * 
  * Registers all SQL view functions for the @SCHEMA@ database schema.
- * ODB uses this to set up the function pointers for
+ * ODB (Observations Data Base) uses this to set up the function pointers for
  * each view defined in the SQL files.
  *
  * NOTE: This file is auto-generated from cmake/templates/_Sstatic.c.in

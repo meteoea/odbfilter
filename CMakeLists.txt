@@ -1,6 +1,6 @@
 # CMakeLists.txt for odbfilter project
 # 
-# This project filters ODB (Ocean Data Base) data using SQL-like queries.
+# This project filters ODB (Observations Data Base) data using SQL-like queries.
 # It auto-detects database schemas from ddl.* directories and generates
 # the necessary C glue code from templates in cmake/templates/.
 #
