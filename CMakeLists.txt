@@ -218,4 +218,4 @@ install(TARGETS odb_filter DESTINATION bin)
 
 # Install helper scripts
 install(PROGRAMS scripts/CCMA2ECMA src/create_ioassign DESTINATION bin)
-install(PROGRAMS scripts/odbtbx.sh DESTINATION bin)
+install(PROGRAMS scripts/build_for_pack.sh scripts/odbtbx.sh DESTINATION bin)

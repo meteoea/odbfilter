@@ -14,3 +14,4 @@ cmake_install.cmake
 # Generated source files
 src/_odb_glue.c
 src/*_Sstatic.c
+AGENTS.md
