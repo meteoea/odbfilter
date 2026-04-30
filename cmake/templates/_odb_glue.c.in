@@ -3,7 +3,7 @@
  * 
  * This file provides the interface between the ODB (Ocean Data Base) library
  * and the odbfilter application. It sets up entry points for database schemas
- * (CCMA, ECMA) and registers static initializers.
+ * and registers static initializers.
  */
 
 #include <stdio.h>
@@ -36,7 +36,7 @@ else { /* fprintf(stderr,"***Warning: Not initializing '%s'\n",#db); */ }
 
 /*
  * Entry point called by ODB to set up database schema initializers
- * Registers static init functions for CCMA and ECMA schemas
+ * Registers static init functions for all detected schemas
  */
 void
 codb_set_entrypoint_(const char *dbname
@@ -50,7 +50,5 @@ codb_set_entrypoint_(const char *dbname
             "codb_set_entrypoint_(dbname='%*s', dbname_len=%d)\n",
             dbname_len, dbname, dbname_len);
   }
-  Static_Init(CCMA);
-  Static_Init(ECMA);
+@STATIC_INIT_CALLS@
 }
-
