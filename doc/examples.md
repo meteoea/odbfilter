@@ -39,14 +39,6 @@ odb_filter timeslot 12
 # Keep only TEMP observations (obstype=5)
 odb_filter type 5
 ```
-
-**Common Observation Types**:
-- `5`: TEMP (radiosondes)
-- `4`: SYNOP (surface stations)
-- `3`: AIREP (aircraft)
-- `2`: DRIBU (drifting buoys)
-- `1`: TEMP SHIP (ships)
-
 ---
 
 ### 3. Delete Specific Observation Type
@@ -74,13 +66,6 @@ This sets `DATUM_STATUS.ACTIVE=0` and `REPORT_STATUS.ACTIVE=0`.
 # Keep TEMP temperature observations (varno=2)
 odb_filter varno 5 2
 ```
-
-**Common Variable Numbers**:
-- `2`: Temperature
-- `3`: Pressure
-- `4`: Specific humidity
-- `7`: Wind u-component
-- `8`: Wind v-component
 
 ---
 
@@ -261,21 +246,8 @@ odb_filter singleobscanal 4 2 5
 
 ---
 
-### 14. Custom Selection (Sophie)
 
-**Filter**: `sophie`
-
-**Purpose**: Custom selection for Sophie's analysis.
-
-```bash
-odb_filter sophie
-```
-
-This filter uses predefined criteria (check `sql/select_sophie.sql` for details).
-
----
-
-### 15. Copy First Guess Departures
+### 14. Copy First Guess Departures
 
 **Filter**: `fg_depar`
 
@@ -289,7 +261,7 @@ Modifies the database by copying `fg_depar` values to column 2.
 
 ---
 
-### 16. Copy Analysis Departures
+### 15. Copy Analysis Departures
 
 **Filter**: `an_depar`
 
@@ -303,7 +275,7 @@ Modifies the database by copying `an_depar` values to column 2.
 
 ---
 
-### 17. Delete Passive Observations
+### 16. Delete Passive Observations
 
 **Filter**: `delete_passive`
 
@@ -317,7 +289,7 @@ Removes observations where `DATUM_STATUS.ACTIVE=0`.
 
 ---
 
-### 18. Debug Filter
+### 17. Debug Filter
 
 **Filter**: `debug`
 
