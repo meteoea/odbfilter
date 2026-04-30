@@ -76,7 +76,7 @@ foreach(_schema ${_SCHEMAS})
   include_directories(${CMAKE_CURRENT_BINARY_DIR}/ddl.${_schema})
 endforeach()
 
-# Fiat library support (optional - for ECMWF Fiat library integration)
+# Fiat library support (optional - for Fiat library integration)
 set(FIAT_DIR "" CACHE PATH "Fiat installation directory")
 if(FIAT_DIR AND EXISTS "${FIAT_DIR}")
   set(INCFIAT "${FIAT_DIR}/include/fiat" CACHE PATH "")

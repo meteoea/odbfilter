@@ -58,7 +58,7 @@ make install
 Compile in Pack Environment
 -------------------------------
 
-For ECMWF pack environments (CY49T1, CY50T2, etc.):
+For IAL gmkpack environments (CY49T1, CY50T2, etc.):
 
 ```bash
 cd odbfilter

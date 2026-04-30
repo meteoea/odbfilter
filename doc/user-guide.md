@@ -7,9 +7,9 @@ odbfilter is a tool for filtering and updating ODB (Observations Data Base) data
 ### Key Features
 
 - Filter observations by type, time slot, geographic area, and more
-- Works with CCMA (Conventional and satellite observation data) and ECMA (Model equivalent) database schemas
+- Works with CCMA and ECMA database schemas
 - Customizable SQL views for complex filtering logic
-- Integration with ODB shuffle operations (CCMA ↔ ECMA)
+- Integration with ODB shuffle operations (CCMA <-> ECMA)
 
 ---
 
@@ -38,7 +38,7 @@ make install
 
 ### Build in a Pack Environment
 
-For ECMWF pack environments (CY49T1, CY50T2, etc.), use the provided build script:
+For IAL gmkpack environments (CY49T1, CY50T2, etc.), use the provided build script:
 
 ```bash
 ./build_for_pack.sh
@@ -178,18 +178,6 @@ scripts/CCMA2ECMA
 ```
 
 This is useful for converting conventional observation data to model equivalent format.
-
----
-
-## Database Schemas
-
-### CCMA (Conventional and Satellite Observation Data)
-
-The primary database schema for conventional and satellite observations. This is the main database that `odb_filter` operates on.
-
-### ECMA (Model Equivalent)
-
-The model equivalent of CCMA. Used for comparison and validation. Data can be transferred between CCMA and ECMA using the shuffle operation.
 
 ---
 

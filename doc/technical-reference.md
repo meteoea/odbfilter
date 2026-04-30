@@ -4,7 +4,7 @@
 
 ### Overview
 
-ODB (Observations Data Base) is a database system used in numerical weather prediction for storing and processing observation data. It is primarily used within the ECMWF (European Centre for Medium-Range Weather Forecasts) ecosystem.
+ODB (Observations Data Base) is a database system used in numerical weather prediction for storing and processing observation data. 
 
 ### Key Concepts
 
@@ -13,19 +13,13 @@ ODB (Observations Data Base) is a database system used in numerical weather pred
 - **Views**: SQL-based queries that define data selection/modification
 - **Anchors**: Entry points for ODB to initialize schema functions
 
-### CCMA Schema
+### ECMA/CCMA Schema
 
 **Conventional and Satellite Observation Data**
 
 - Primary schema for conventional observations (TEMP, SYNOP, etc.) and satellite data
 - Tables: `hdr`, `body`, `errstat`, `cma` (CMA-specific)
 - Used by `odb_filter` as the main input/output database
-
-### ECMA Schema
-
-**Model Equivalent of CCMA**
-
-- Contains model representations of the same observations
 - Used for validation and comparison
 - Data can be transferred between CCMA and ECMA via shuffle operations
 

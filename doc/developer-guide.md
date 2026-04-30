@@ -4,35 +4,35 @@
 
 ```
 odbfilter/
-├── CMakeLists.txt              # Main CMake build configuration
-├── build_for_pack.sh          # Build script for pack environments
-├── README.md                  # Project overview and quick start
-├── cmake/
-│   └── templates/
-│       ├── _odb_glue.c.in    # Template for ODB glue code
-│       └── _Sstatic.c.in     # Template for schema static initializers
-├── src/
-│   ├── filter.F90             # Main Fortran program
-│   ├── odb_filter_mod.F90    # Fortran module (init/cleanup)
-│   ├── _odb_glue.c          # Generated: ODB entry point (in build/)
-│   └── *_Sstatic.c          # Generated: Schema initializers (in build/)
-├── sql/                       # SQL view definitions
-│   ├── select_all.sql
-│   ├── select_obstype.sql
-│   └── ... (23 SQL files total)
-├── ddl.CCMA -> sql/          # Schema symlink (auto-detected)
-├── ddl.ECMA -> sql/          # Schema symlink (auto-detected)
-├── scripts/
-│   ├── odb_filter.sh        # Wrapper script with ODB environment
-│   ├── odbtbx.sh            # Toolbox: filter + shuffle
-│   ├── CCMA2ECMA           # Convert CCMA to ECMA format
-│   └── create_ioassign      # Create IOASSIGN file
-├── doc/                      # Documentation (this directory)
-│   ├── user-guide.md
-│   ├── developer-guide.md   # (this file)
-│   ├── technical-reference.md
-│   └── examples.md
-└── build/                    # Build directory (generated)
++-- CMakeLists.txt              # Main CMake build configuration
++-- build_for_pack.sh          # Build script for pack environments
++-- README.md                  # Project overview and quick start
++-- cmake/
+|   +-- templates/
+|       +-- _odb_glue.c.in    # Template for ODB glue code
+|       +-- _Sstatic.c.in     # Template for schema static initializers
++-- src/
+|   +-- filter.F90             # Main Fortran program
+|   +-- odb_filter_mod.F90    # Fortran module (init/cleanup)
+|   +-- _odb_glue.c          # Generated: ODB entry point (in build/)
+|   +-- *_Sstatic.c          # Generated: Schema initializers (in build/)
++-- sql/                       # SQL view definitions
+|   +-- select_all.sql
+|   +-- select_obstype.sql
+|   +-- ... (23 SQL files total)
++-- ddl.CCMA -> sql/          # Schema symlink (auto-detected)
++-- ddl.ECMA -> sql/          # Schema symlink (auto-detected)
++-- scripts/
+|   +-- odb_filter.sh        # Wrapper script with ODB environment
+|   +-- odbtbx.sh            # Toolbox: filter + shuffle
+|   +-- CCMA2ECMA           # Convert CCMA to ECMA format
+|   +-- create_ioassign      # Create IOASSIGN file
++-- doc/                      # Documentation (this directory)
+|   +-- user-guide.md
+|   +-- developer-guide.md   # (this file)
+|   +-- technical-reference.md
+|   +-- examples.md
++-- build/                    # Build directory (generated)
 ```
 
 ---
@@ -235,7 +235,7 @@ To change the generated C code:
 
 ### Optional
 
-- **Fiat**: ECMWF Fiat library (set `FIAT_DIR` to enable)
+- **Fiat**: Fiat library (set `FIAT_DIR` to enable)
 
 ---
 
