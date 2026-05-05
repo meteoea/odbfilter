@@ -1,0 +1,3 @@
+      INTEGER KNTN
+      COMMON /BCOMUNIT/ KNTN
+C

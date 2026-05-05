@@ -1,0 +1,3 @@
+      INTEGER          ICOMP
+      COMMON /BCOMCOM/ ICOMP
+C

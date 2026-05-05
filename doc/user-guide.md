@@ -9,7 +9,7 @@ odbfilter is a tool for filtering and updating ODB (Observations Data Base) data
 - Filter observations by type, time slot, geographic area, and more
 - Works with CCMA and ECMA database schemas
 - Customizable SQL views for complex filtering logic
-- Integration with ODB shuffle operations (CCMA ↔ ECMA)
+- Integration with ODB shuffle operations (CCMA <-> ECMA)
 
 ---
 

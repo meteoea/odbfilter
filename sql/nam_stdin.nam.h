@@ -1,0 +1,1 @@
+../odb/include/nam_stdin.nam.h

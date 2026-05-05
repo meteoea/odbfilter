@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
 # build_for_pack.sh - Build script for odbfilter in a pack environment
 #
@@ -8,6 +8,9 @@
 #
 # Usage: ./build_for_pack.sh
 #
+
+rm -f build.log
+exec 1> >(tee -a build.log) 2>&1
 
 # Print environment information
 echo "====================="
@@ -19,15 +22,15 @@ module load cmake/3.15.4
 
 # Environment setup for CY49T1 (Cycles 49, Type 1)
 # This sets up Intel compiler and MPI environment
-source ~gco/apps/mkpack/support/wrapper/env_intel-mpi-2018.05.274_auxlib-014R64
-BUILDDIR=build-49
+#export PACK=/home/gmap/mrpe/arbogaste/pack/cy49t1_op1.07.IMPIIFC2018DP.x
 
 # Environment setup for CY50T2 (Cycles 50, Type 2) - Commented out
-#source ~mary/.gmkpack/env/env_intel-mpi-2023.2-eccodes2.44.0
-#BUILDDIR=build-50
+export PACK=/home/gmap/mrpe/arbogaste/pack/valid_50T2.INTEL23.dp
 
-# Pack root directory (contains ODB, libraries, and dependencies)
-export PACK=/home/gmap/mrpe/arbogaste/pack/cy49t1_op1.07.IMPIIFC2018DP.x
+PACKID=`basename $PACK | cut -d. -f1`
+BUILDIR=build.$PACKID
+GMKENV=`grep "GMK_LOCAL_PROFILE" $PACK/.gmkfile/* | cut -d\  -f 3`
+source $GMKENV
 
 # Pack type: "main" for production, "local" for development
 export TYPE_PACK=main
@@ -50,7 +53,7 @@ export ODB_CREATE_IOASSIGN=$PACK/src/$TYPE_PACK/odb/scripts/create_ioassign
 export ODB_SYSPATH=$PACK/src/$TYPE_PACK/odb/ddl.CCMA
 
 # ODB C compiler flags (without OML support)
-export ODB_CC="gcc -DWITHOUT_OML"
+export ODB_CC="gcc -DWITHOUT_OML -Wno-implicit-function-declaration"
 
 # Print build information
 echo "=============="
@@ -58,7 +61,7 @@ echo "Build, Install"
 echo "=============="
 
 # Clean previous build and install directories
-rm -rf build install
+rm -rf $BUILDIR install.$PACKID
 
 # Configure with CMake
 # - Use Intel compilers (icc, icpc, ifort)
@@ -74,16 +77,15 @@ cmake . \
   \
   -DLIBNCDF=$NCDF \
   -DLIBNCDFF=$NCDFF \
-  -DINC_CMA=$PACK/src/$TYPE_PACK/odb/ddl \
   -DINC_ODB=$PACK/src/$TYPE_PACK/odb/module \
   -DFIAT_DIR=$PACK/hub/$TYPE_PACK/install/Fiat \
   -DTYPE_PACK=$TYPE_PACK \
   -DPACK=$PACK \
   \
-  -DCMAKE_INSTALL_PREFIX=install \
-  -B build
+  -DCMAKE_INSTALL_PREFIX=install.$PACKID \
+  -B $BUILDIR
 
 # Build and install
-cd build
-make -j10
+cd $BUILDIR
+make -j20
 make install
