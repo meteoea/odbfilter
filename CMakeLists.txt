@@ -62,11 +62,6 @@ foreach(_ddl ${_DDL_DIRS})
 endforeach()
 list(REMOVE_DUPLICATES _CMA_S)
 
-# Add include directories for each CMA's build directory
-foreach(_cma ${_CMA_S})
-  include_directories(${CMAKE_CURRENT_BINARY_DIR}/ddl.${_cma})
-endforeach()
-
 # Generate ODB glue code with static initialization calls for each CMA
 set(STATIC_INIT_CALLS "")
 foreach(_cma ${_CMA_S})

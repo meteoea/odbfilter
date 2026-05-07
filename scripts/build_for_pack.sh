@@ -47,13 +47,9 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NCDFF:$NCDF
 # ODB compiler and flags
 export ODB_COMPILER=$PACK/sys
 export ODB_COMPILER_FLAGS=$PACK/src/$TYPE_PACK/odb/ddl.CCMA/odb98.flags
-
-# ODB helper scripts
-export ODB_CREATE_IOASSIGN=$PACK/src/$TYPE_PACK/odb/scripts/create_ioassign
-export ODB_SYSPATH=$PACK/src/$TYPE_PACK/odb/ddl.CCMA
-
-# ODB C compiler flags (without OML support)
-export ODB_CC="gcc -DWITHOUT_OML -Wno-implicit-function-declaration"
+export ODB_SYSPATH=`pwd`/odb/include
+export ODB_NMXUPD=4
+export ODB_CC="gcc -DWITHOUT_OML -DODB_NMXUPD=$ODB_NMXUPD -Wno-implicit-function-declaration"
 
 # Print build information
 echo "=============="

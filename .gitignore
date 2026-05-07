@@ -1,5 +1,6 @@
-build/
-install/
+build*/
+build*
+install*/
 Makefile
 CMakeFiles/
 CMakeCache.txt

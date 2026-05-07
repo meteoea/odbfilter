@@ -7,8 +7,6 @@ set(SQL_OBJ_FILES "")
 file(GLOB CMA_SQL_PATHFILES "*.sql")
 set(CMA_SQL_FILES "")
 
-# Include ODB headers for SQL compilation
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../odb/include )
 
 # Extract CMA name from directory extension (e.g., ddl.cca -> cca)
 set(_SQL_BASES "")
@@ -21,10 +19,15 @@ foreach(_F ${CMA_SQL_PATHFILES})
     list(APPEND _SQL_BASES ${_base})
 endforeach()
 
+# Include ODB headers for SQL compilation
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../odb/include )
+
 # Process DDL file to generate C header with table definitions
+
+set(ODB_FLAGS "-DODB_NMXUPD=$ENV{ODB_NMXUPD}")
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${cma}.h
-  COMMAND ${ODB98_EXECUTABLE} -c -o ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${cma}.ddl
+  COMMAND ${ODB98_EXECUTABLE} ${ODB_FLAGS} -DODB_NMXUPD=${ODB_NMXUPD} -c -o ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/${cma}.ddl
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${cma}.ddl
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Processing ${cma}"
@@ -74,7 +77,7 @@ foreach(sql ${CMA_SQL_FILES})
 
     add_custom_command(
       OUTPUT ${CMA_OBJ}
-      COMMAND ${ODB98_EXECUTABLE} -c -l ${cma} -w -l ${cma} -w ${sql}
+      COMMAND ${ODB98_EXECUTABLE} ${ODB_FLAGS} -c -l ${cma} -w -l ${cma} -w ${sql}
       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${sql} ${CMAKE_CURRENT_BINARY_DIR}/${cma}.h
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Processing ${sql} for ${cma}"
